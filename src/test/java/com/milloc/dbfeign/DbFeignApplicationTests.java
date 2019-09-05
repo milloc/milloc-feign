@@ -13,14 +13,12 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = DbFeignApplication.class)
 public class DbFeignApplicationTests {
     @Autowired
-    private RestTemplate restTemplate;
+    private TestClient testClient;
     @Test
     public void contextLoads() {
-        TestClient testClient = (TestClient) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                new Class[]{TestClient.class}, new DBInvocationHandler(restTemplate));
         Map<String, Object> map = testClient.testPost("aaa", "bbb", "hello", "cccc");
         System.out.println("map = " + map);
     }

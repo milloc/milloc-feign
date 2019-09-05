@@ -1,6 +1,7 @@
 package com.milloc.tool.client;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -35,5 +36,10 @@ public class DBClientClassPathScanner extends ClassPathBeanDefinitionScanner {
             beanDefinition.setBeanClass(this.dbClientFactoryBean.getClass());
         }
         return beanDefinitionHolders;
+    }
+
+    @Override
+    protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+        return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent();
     }
 }
