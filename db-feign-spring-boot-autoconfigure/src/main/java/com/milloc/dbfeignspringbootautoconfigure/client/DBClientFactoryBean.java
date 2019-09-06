@@ -1,5 +1,6 @@
 package com.milloc.dbfeignspringbootautoconfigure.client;
 
+import com.milloc.dbfeignspringbootautoconfigure.annotation.DBClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -15,7 +16,6 @@ import java.lang.reflect.Proxy;
  */
 public class DBClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
     private InvocationHandler dbInvocationHandler;
-    private ApplicationContext applicationContext;
     private Class<T> clientInterface;
 
     DBClientFactoryBean() {
@@ -43,8 +43,7 @@ public class DBClientFactoryBean<T> implements FactoryBean<T>, ApplicationContex
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-        RestTemplate restTemplate = this.applicationContext.getBean(RestTemplate.class);
-        this.dbInvocationHandler = new DBInvocationHandler(restTemplate);
+        RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
+        this.dbInvocationHandler = new DBInvocationHandler(restTemplate, clientInterface);
     }
 }
