@@ -1,37 +1,41 @@
-# db-fegin
+# db-feign
 
 #### 介绍
-搭配db使用的feign
+自己写的类似于open-feign的远程调用，基于RestTemplate调用。
+参考了Mybatis的自动注册代码
 
-#### 软件架构
-软件架构说明
+### 目的
+1. 了解spring-boot-starter怎么工作
+2. 了解怎么扫描注入Bean
 
+### 原理
+1. Proxy 动态代理生成远程调用服务
+2. RestTemplate 实现远程调用
 
-#### 安装教程
+### 使用
+1. 引入依赖
+    ```
+    <dependency>
+        <groupId>com.milloc</groupId>
+        <artifactId>db-feign-spring-boot-starter</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    ```
+2. 使用 ``@DBClient`` 标记远程调用服务
+    ```
+   @DBClient
+   @RequestMapping(value = "http://localhost:8000", method = RequestMethod.POST)
+   public interface TestClient {
+       @RequestMapping(path = "/{a}/{b}", method = {RequestMethod.GET})
+       Map<String, Object> testGet(@PathVariable("a") String a, @PathVariable("b") String b, @RequestParam("hello") String hello, String ccc);
+   
+       @RequestMapping(path = "/{a}/{b}", method = {RequestMethod.POST})
+       TestDTO testPost(@PathVariable("a") String a, @PathVariable("b") String b, @RequestParam("hello") String hello, String ccc);
+   
+       @RequestMapping("/bcdd")
+       Map<String, Object> test(@RequestBody String abc, @RequestParam("hello") String hello);
+   }
+    ```
 
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### 源码入口
+``com.milloc.dbfeignspringbootautoconfigure.DBFeignConfigurer``
