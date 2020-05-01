@@ -1,4 +1,4 @@
-# db-feign
+# refer-feign
 
 #### 介绍
 自己写的类似于open-feign的远程调用，基于RestTemplate调用。
@@ -21,21 +21,23 @@
         <version>0.0.1-SNAPSHOT</version>
     </dependency>
     ```
-2. 使用 ``@DBClient`` 标记远程调用服务
+2. 使用 ``@ReferClient`` 标记远程调用服务
     ```
-   @DBClient
-   @RequestMapping(value = "http://localhost:8000", method = RequestMethod.POST)
+   @ReferClient
    public interface TestClient {
-       @RequestMapping(path = "/{a}/{b}", method = {RequestMethod.GET})
-       Map<String, Object> testGet(@PathVariable("a") String a, @PathVariable("b") String b, @RequestParam("hello") String hello, String ccc);
+       @PostMapping(path = "http://localhost/{a}/{b}")
+       String post(@PathVariable("a") String a, @PathVariable("b") String b, @QueryParam("hello") String hello, @QueryParam String ccc);
    
-       @RequestMapping(path = "/{a}/{b}", method = {RequestMethod.POST})
-       TestDTO testPost(@PathVariable("a") String a, @PathVariable("b") String b, @RequestParam("hello") String hello, String ccc);
+       @GetMapping(path = "http://localhost/{a}/{b}")
+       String get(@PathVariable("a") String a, @PathVariable("b") String b, @QueryParam("hello") String hello, String ccc);
    
-       @RequestMapping("/bcdd")
-       Map<String, Object> test(@RequestBody String abc, @RequestParam("hello") String hello);
+       @PostMapping(value = "http://localhost/bcdd", consumes = MediaType.APPLICATION_JSON_VALUE)
+       String json(@RequestBody TestDTO testDTO, @QueryParam("hello") String hello);
+   
+       @PostMapping(value = "http://localhost/bcdd", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+       String form(@RequestBody TestDTO testDTO, @QueryParam("hello") String hello);
    }
     ```
 
 ### 源码入口
-``com.milloc.dbfeignspringbootautoconfigure.DBFeignConfigurer``
+``com.milloc.referfeign.springbootautoconfigure.ReferFeignConfigurer``

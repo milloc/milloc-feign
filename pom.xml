@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>db-feign-spring-boot-starter</module>
-        <module>db-feign-spring-boot-autoconfigure</module>
-        <module>db-feign-example</module>
+        <module>refer-feign-example</module>
+        <module>refer-feign-spring-boot-autoconfigure</module>
+        <module>refer-feign-spring-boot-starter</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -15,14 +15,29 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.milloc</groupId>
-    <artifactId>db-feign</artifactId>
+    <artifactId>refer-feign</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>db-feign</name>
-    <description>feign for db</description>
+    <name>refer-feign</name>
+    <description>feign</description>
 
     <properties>
         <java.version>1.8</java.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.milloc.refer-feign</groupId>
+                <artifactId>refer-feign-spring-boot-autoconfigure</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.milloc.refer-feign</groupId>
+                <artifactId>refer-feign-spring-boot-starter</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
