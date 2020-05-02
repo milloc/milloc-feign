@@ -1,15 +1,12 @@
 package com.milloc.referfeign.springbootautoconfigure.parameter;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.milloc.referfeign.springbootautoconfigure.annotation.QueryParam;
+import com.milloc.referfeign.springbootautoconfigure.client.RequestBuilder;
+import com.milloc.referfeign.springbootautoconfigure.util.BeanUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,26 +15,17 @@ import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
 
-public class QueryParamURIParameterResolver implements ParameterResolver, ApplicationContextAware {
-    private ObjectMapper objectMapper;
-
-    @Override
-    public int getOrder() {
-        return 0;
-    }
-
+@Order(0)
+public class QueryParamParameterResolver implements ParameterResolver {
     @SneakyThrows
     @Override
     public boolean resolved(RequestBuilder builder, Parameter parameter, Object value) {
         QueryParam annotationAnn = parameter.getAnnotation(QueryParam.class);
-        HttpMethod httpMethod = builder.getHttpMethod();
         UriComponentsBuilder uriComponentsBuilder = builder.getUriComponentsBuilder();
-        String n = null;
-        if (annotationAnn != null) {
-            n = (String) AnnotationUtils.getValue(annotationAnn);
-        } else if (HttpMethod.POST.equals(httpMethod)) {
+        if (annotationAnn == null) {
             return false;
         }
+        String n = (String) AnnotationUtils.getValue(annotationAnn);
         if (n == null || "".equals(n)) {
             n = parameter.getName();
         }
@@ -51,22 +39,14 @@ public class QueryParamURIParameterResolver implements ParameterResolver, Applic
 
         Object v;
         Class<?> type = parameter.getType();
-        if (type.isPrimitive() || type.isArray() || BeanUtils.isSimpleValueType(type)) {
+        if (type.isPrimitive() || BeanUtils.isSimpleValueType(type)) {
             v = value;
         } else if (Collection.class.isAssignableFrom(type)) {
             v = ((Collection<?>) value).toArray();
         } else {
-            // pojo
-            String json = objectMapper.writeValueAsString(value);
-            v = objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
-            });
+            v = BeanUtil.beanToMap(value);
         }
         uriComponentsBuilder.queryParam(n, v);
         return true;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        objectMapper = applicationContext.getBean(ObjectMapper.class);
     }
 }

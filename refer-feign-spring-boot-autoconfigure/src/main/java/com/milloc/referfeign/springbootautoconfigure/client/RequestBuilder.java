@@ -1,4 +1,4 @@
-package com.milloc.referfeign.springbootautoconfigure.parameter;
+package com.milloc.referfeign.springbootautoconfigure.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

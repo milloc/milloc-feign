@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 @ReferClient
 public interface TestClient {
@@ -15,11 +16,14 @@ public interface TestClient {
     String post(@PathVariable("a") String a, @PathVariable("b") String b, @QueryParam("hello") String hello, @QueryParam String ccc);
 
     @GetMapping(path = "http://localhost/{a}/{b}")
-    String get(@PathVariable("a") String a, @PathVariable("b") String b, @QueryParam("hello") String hello, String ccc);
+    String get(@PathVariable("a") String a, @PathVariable("b") String b, @QueryParam("hello") String hello, @QueryParam String ccc);
 
     @PostMapping(value = "http://localhost/bcdd", consumes = MediaType.APPLICATION_JSON_VALUE)
     String json(@RequestBody TestDTO testDTO, @QueryParam("hello") String hello);
 
     @PostMapping(value = "http://localhost/bcdd", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     String form(@RequestBody TestDTO testDTO, @QueryParam("hello") String hello);
+
+    @PostMapping(value = "http://localhost/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    String file(MultipartFile file);
 }

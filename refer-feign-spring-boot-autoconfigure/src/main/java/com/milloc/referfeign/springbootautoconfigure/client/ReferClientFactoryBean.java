@@ -5,6 +5,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.annotation.OrderUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
@@ -50,9 +52,8 @@ public class ReferClientFactoryBean<T> implements FactoryBean<T>, ApplicationCon
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
         Map<String, ParameterResolver> beansOfType = applicationContext.getBeansOfType(ParameterResolver.class);
-        List<ParameterResolver> parameterResolvers = beansOfType.values().stream()
-                .sorted(Comparator.comparing(ParameterResolver::getOrder))
-                .collect(Collectors.toList());
+        List<ParameterResolver> parameterResolvers = new ArrayList<>(beansOfType.values());
+        AnnotationAwareOrderComparator.sort(parameterResolvers);
         this.referInvocationHandler = new ReferInvocationHandler(restTemplate, parameterResolvers, clientInterface);
     }
 }

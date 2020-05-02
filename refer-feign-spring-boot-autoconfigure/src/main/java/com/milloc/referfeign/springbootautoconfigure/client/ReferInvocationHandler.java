@@ -1,11 +1,9 @@
 package com.milloc.referfeign.springbootautoconfigure.client;
 
 import com.milloc.referfeign.springbootautoconfigure.parameter.ParameterResolver;
-import com.milloc.referfeign.springbootautoconfigure.parameter.RequestBuilder;
 import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
@@ -79,13 +77,25 @@ public class ReferInvocationHandler implements InvocationHandler {
 
         URI uri = requestBuilder.getUriComponentsBuilder().build().toUri();
         HttpEntity<?> httpEntity = new HttpEntity<>(requestBuilder.getBody(), requestBuilder.getHttpHeaders());
-        Type returnType = method.getGenericReturnType();
+
         // 发送请求
-        ResponseEntity<Object> responseEntity = restTemplate.exchange(uri, httpMethod, httpEntity, ParameterizedTypeReference.forType(returnType));
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            return responseEntity.getBody();
+        ResponseEntity<Object> responseEntity;
+        Class<?> returnType = method.getReturnType();
+        if (ResponseEntity.class.isAssignableFrom(returnType) || HttpStatus.class.isAssignableFrom(returnType)) {
+            responseEntity = restTemplate.exchange(uri, httpMethod, httpEntity, Object.class);
+            if (ResponseEntity.class.isAssignableFrom(returnType)) {
+                return responseEntity;
+            }
+            return responseEntity.getStatusCode();
         } else {
-            throw new ReferClientResolveException(String.format("返回结果错误 %s", responseEntity.toString()));
+            Type genericReturnType = method.getGenericReturnType();
+            responseEntity = restTemplate.exchange(uri, httpMethod, httpEntity, ParameterizedTypeReference.forType(genericReturnType));
+
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                return responseEntity.getBody();
+            } else {
+                throw new ReferClientResolveException(String.format("返回结果错误 %s", responseEntity.toString()));
+            }
         }
     }
 }

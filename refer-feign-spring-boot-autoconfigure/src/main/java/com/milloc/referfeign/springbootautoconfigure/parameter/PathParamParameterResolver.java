@@ -1,13 +1,11 @@
 package com.milloc.referfeign.springbootautoconfigure.parameter;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.milloc.referfeign.springbootautoconfigure.client.RequestBuilder;
+import com.milloc.referfeign.springbootautoconfigure.util.BeanUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,14 +14,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PathParamURIParameterResolver implements ParameterResolver, ApplicationContextAware {
-    private ObjectMapper objectMapper;
-
-    @Override
-    public int getOrder() {
-        return 0;
-    }
-
+@Order(0)
+public class PathParamParameterResolver implements ParameterResolver {
     @SneakyThrows
     @Override
     public boolean resolved(RequestBuilder builder, Parameter parameter, Object value) {
@@ -50,15 +42,8 @@ public class PathParamURIParameterResolver implements ParameterResolver, Applica
         }
 
         // pojo
-        String s = objectMapper.writeValueAsString(value);
-        Map<String, Object> o = objectMapper.readValue(s, new TypeReference<Map<String, Object>>() {
-        });
-        uriComponentsBuilder.uriVariables(o);
+        uriComponentsBuilder.uriVariables(BeanUtil.beanToMap(value));
         return true;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.objectMapper = applicationContext.getBean(ObjectMapper.class);
-    }
 }
