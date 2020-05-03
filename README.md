@@ -16,8 +16,8 @@
 1. 引入依赖
     ```
     <dependency>
-        <groupId>com.milloc</groupId>
-        <artifactId>db-feign-spring-boot-starter</artifactId>
+        <groupId>com.milloc.feign</groupId>
+        <artifactId>refer-feign-spring-boot-starter</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </dependency>
     ```
@@ -38,6 +38,5 @@
        String form(@RequestBody TestDTO testDTO, @QueryParam("hello") String hello);
    }
     ```
-
 ### 源码入口
 ``com.milloc.referfeign.springbootautoconfigure.ReferFeignConfigurer``

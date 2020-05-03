@@ -13,7 +13,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Parameter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Order(0)
 public class QueryParamParameterResolver implements ParameterResolver {
@@ -32,14 +35,30 @@ public class QueryParamParameterResolver implements ParameterResolver {
 
         if (value instanceof Map) {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            ((Map<?, ?>) value).forEach((mK, mV) -> params.add(mK.toString(), mV.toString()));
+            ((Map<?, ?>) value).forEach((mK, mV) -> {
+                if (mV instanceof Collection) {
+                    List<String> stringV = ((Collection<?>) mV).stream()
+                            .map(Object::toString)
+                            .collect(Collectors.toList());
+                    params.addAll(mK.toString(), stringV);
+                } else {
+                    if (mV instanceof Object[]) {
+                        List<String> stringV = Stream.of((Object[]) mV)
+                                .map(Object::toString)
+                                .collect(Collectors.toList());
+                        params.addAll(mK.toString(), stringV);
+                    } else {
+                        params.add(mK.toString(), mV.toString());
+                    }
+                }
+            });
             uriComponentsBuilder.replaceQueryParams(params);
             return true;
         }
 
         Object v;
         Class<?> type = parameter.getType();
-        if (type.isPrimitive() || BeanUtils.isSimpleValueType(type)) {
+        if (BeanUtils.isSimpleValueType(type)) {
             v = value;
         } else if (Collection.class.isAssignableFrom(type)) {
             v = ((Collection<?>) value).toArray();

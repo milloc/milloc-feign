@@ -33,7 +33,7 @@ public class PathParamParameterResolver implements ParameterResolver {
         }
 
         Class<?> type = parameter.getType();
-        if (type.isPrimitive() || BeanUtils.isSimpleValueType(type)) {
+        if (BeanUtils.isSimpleValueType(type)) {
             String n;
             Map<String, Object> map = Collections.singletonMap(
                     (n = (String) AnnotationUtils.getValue(pathVariableAnn)) == null ? parameter.getName() : n, value);

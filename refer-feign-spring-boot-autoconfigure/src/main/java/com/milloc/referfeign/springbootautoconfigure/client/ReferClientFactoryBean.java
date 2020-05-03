@@ -6,16 +6,13 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.core.annotation.OrderUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author gongdeming
@@ -51,9 +48,11 @@ public class ReferClientFactoryBean<T> implements FactoryBean<T>, ApplicationCon
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
+        // 加载 ParameterResolver 并对 Order 排序
         Map<String, ParameterResolver> beansOfType = applicationContext.getBeansOfType(ParameterResolver.class);
         List<ParameterResolver> parameterResolvers = new ArrayList<>(beansOfType.values());
         AnnotationAwareOrderComparator.sort(parameterResolvers);
+
         this.referInvocationHandler = new ReferInvocationHandler(restTemplate, parameterResolvers, clientInterface);
     }
 }

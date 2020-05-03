@@ -26,16 +26,16 @@ public class FormParameterResolver implements ParameterResolver {
             if (MediaType.MULTIPART_FORM_DATA.equals(contentType) || MediaType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
                 RequestBody annotation = param.getAnnotation(RequestBody.class);
                 if (annotation != null) {
-                    Map<?, ?> beanMap = null;
-                    if (value instanceof Map) {
-                        beanMap = (Map<?, ?>) value;
-                    }
-                    if (BeanUtils.isSimpleValueType(value.getClass())) {
-                        beanMap = BeanUtil.beanToMap(value);
-                    }
-                    if (beanMap == null) {
+                    if (BeanUtils.isSimpleProperty(value.getClass())) {
                         return false;
                     }
+                    Map<?, ?> beanMap;
+                    if (value instanceof Map) {
+                        beanMap = (Map<?, ?>) value;
+                    } else {
+                        beanMap = BeanUtil.beanToMap(value);
+                    }
+
                     MultiValueMap<Object, Object> params = new LinkedMultiValueMap<>();
                     beanMap.forEach(params::add);
                     builder.setBody(params);
